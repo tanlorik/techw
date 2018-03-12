@@ -52,6 +52,13 @@ class S(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             
         self.end_headers()
+
+    def _set_404(self):
+        self.send_response(404)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        
+
         
     def _get_args(self):
         ctype, pdict = parse_header(self.headers['content-type'])
@@ -76,29 +83,27 @@ class S(BaseHTTPRequestHandler):
         request_id = unquote(parsed_path.path)
         path_args = self._parse_path(request_id)
         vars = self._get_args()
-        if method == "post":
-            fixed_vars = {}
-            for item in vars:
-                fixed_vars[item] = vars[item][0]
-            if "report" in path_args:
-                report(fixed_vars)
-        else:
-            data = open(os.path.join(_APP_ROOT_, 'index.html'), 'r').read()
-            print(data)
+        fixed_vars = {}
+        for item in vars:
+            fixed_vars[item] = vars[item][0]
+        if "report" in path_args:
+            report(fixed_vars)
                 
 
     def do_GET(self):
-        self._parse_request(method="get")
-        return
+        parsed_path = urlparse(self.path)
+        request_id = unquote(parsed_path.path)[1:]
         
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        self.wfile.write(make_bytes("<h1>This server only supports HEAD/POST requests</h1></br>"))
-        if _DEBUG_:
-            parsed_path = urlparse(self.path)
-            request_id = unquote(parsed_path.path)
-            self.wfile.write(make_bytes("path is: {}".format(request_id)))
+        if request_id == "":
+            request_id = "index.html"
+        print(request_id)
+        print(os.path.join(_APP_ROOT_, request_id))
+        if os.path.exists(os.path.join(_APP_ROOT_, request_id)):
+            self._set_headers("get")
+            data = open(os.path.join(_APP_ROOT_, request_id), 'r').read()
+            self.wfile.write(make_bytes((data)))
+        else:
+            self._set_404()
 
     def do_POST(self):
         self._parse_request(method="post")
