@@ -177,7 +177,7 @@ class S(BaseHTTPRequestHandler):
 
 def run(server_class=HTTPServer, handler_class=S, port=None):
     if port is None:
-        port = os.environ.get('PORT')
+        port = int(os.environ.get('PORT'))
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print('Starting httpd...')
