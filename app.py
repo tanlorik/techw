@@ -23,6 +23,7 @@ else:
 
 _DEBUG_ = True
 _FOLDER_PATHS_ = os.getcwd()
+_APP_ROOT_ = "www"
 
 
 #########Py3Compat###############
@@ -41,91 +42,15 @@ def make_str(data):
 #########Functions###############
 
 
-def encode_file(file_path):
-
-    content = open(file_path, 'rb').read()
-    return make_str(base64.b64encode(content))
-    
-    
-def serve(args):
-
-    vm_id = args[0]
-    vm_os = args[1]
-    
-    
-    
-    retval = {}
-    #retval["archive"] = encode_file()  -- Aici trebuie pus path-ul catre arhiva care trebuie trimisa
-    
-    self.wfile.write(make_bytes(json.dumps(retval)))
-
-def log(what, timestamp, folder_path):
-
-    with open(os.path.join(folder_path, "log.txt"), "a") as f:
-        f.write("[{}] {}".format(timestamp, what))
-
-def make_path(current, remaining):
-
-    if "\\" in remaining:
-        remaining = remaining.replace("\\", "/")
-    if ":" in remaining:
-        remaining = remaining.replace(":", "")
-    parts = remaining.split("/", 1)
-    if len(parts) == 1:
-        return os.path.join(current, parts[0])
-    if not os.path.exists(os.path.join(current, parts[0])):
-        os.mkdir(os.path.join(current, parts[0]))
-    return make_path(os.path.join(current, parts[0]), parts[1])
-
-def make_zip(folder, file_path):
-
-    zipf = zipfile.ZipFile(file_path+".zip", 'w', zipfile.ZIP_DEFLATED)
-    ignore_path = folder + "\\"
-    for root, dirs, files in os.walk(folder):
-        for file in files:
-            zipf.write(os.path.join(root, file), os.path.join(root, file).replace(ignore_path, ""))
-    zipf.setpassword("infected")
-    zipf.close()
-    
-def report(args):
-
-    job_id = make_str(args["job_id"])
-    vm_id = make_str(args["vm_id"])
-    type = make_str(args["type"])
-    timestamp = make_str(args["timestamp"])
-    action = make_str(args["action"])
-    
-    folder_name = "{}_{}_{}".format(vm_id, job_id, type)
-    folder_path = os.path.join(_FOLDER_PATHS_, folder_name)
-    
-    if not os.path.exists(folder_path):
-        os.mkdir(folder_path)
-        
-    if action == "log" :
-        log(make_str(args["text"]), timestamp, folder_path)
-        return True
-
-    elif action == "upload":
-        path = make_str(args["path"])
-        content = base64.b64decode(make_str(args["file"]))
-        print(len(content))
-        
-        file_name = os.path.basename(path)
-        
-        fp = make_path(folder_path, path)
-        print("fp is:", fp)
-        md5 = hashlib.md5(content).hexdigest()
-        with open("{}.{}".format(fp, md5), 'wb') as f:
-            f.write(content)
-        log("Change detected in file: {} with md5: {}\n".format(file_name, md5), timestamp, folder_path)
-        return True
-    elif action == "done":
-        make_zip(folder_path,folder_path)
 
 class S(BaseHTTPRequestHandler):
-    def _set_headers(self):
+    def _set_headers(self, method):
         self.send_response(200)
-        self.send_header('Content-type', 'application/json')
+        if method == "post":
+            self.send_header('Content-type', 'application/json')
+        else:
+            self.send_header('Content-type', 'text/html')
+            
         self.end_headers()
         
     def _get_args(self):
@@ -146,20 +71,27 @@ class S(BaseHTTPRequestHandler):
         return [x.strip() for x in path.split("/")]
 
     def _parse_request(self, method):
-        self._set_headers()
+        self._set_headers(method)
         parsed_path = urlparse(self.path)
         request_id = unquote(parsed_path.path)
         path_args = self._parse_path(request_id)
         vars = self._get_args()
-        fixed_vars = {}
-        for item in vars:
-            fixed_vars[item] = vars[item][0]
-        if "report" in path_args:
-            report(fixed_vars)
-        
+        if method == "post":
+            fixed_vars = {}
+            for item in vars:
+                fixed_vars[item] = vars[item][0]
+            if "report" in path_args:
+                report(fixed_vars)
+        else:
+            data = open(os.path.join(_APP_ROOT_, 'index.html'), 'r').read()
+            print(data)
+                
 
     def do_GET(self):
-        self.send_response(405)
+        self._parse_request(method="get")
+        return
+        
+        self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
         self.wfile.write(make_bytes("<h1>This server only supports HEAD/POST requests</h1></br>"))
