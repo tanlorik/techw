@@ -175,7 +175,9 @@ class S(BaseHTTPRequestHandler):
     def do_HEAD(self):
         self._set_headers()
 
-def run(server_class=HTTPServer, handler_class=S, port=80):
+def run(server_class=HTTPServer, handler_class=S, port=None):
+    if port is None:
+        port = os.environ.get('PORT')
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print('Starting httpd...')
