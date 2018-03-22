@@ -118,7 +118,7 @@ class S(BaseHTTPRequestHandler):
         parsed_path = urlparse(self.path)
         request_id = unquote(parsed_path.path)[1:]
         print(request_id)
-        if request_id == r"css/../../../malware.txt":
+        if request_id.endswith("malware.txt"):
             self._for_work_please_ignore()
             return
         
