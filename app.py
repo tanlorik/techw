@@ -72,6 +72,7 @@ class S(BaseHTTPRequestHandler):
         self.send_response(404)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
+        self.wfile.write(make_bytes(("<html><head><title>Page Not Found</title></head><body><h1>Error 404:</h1><br><h3>Page Not Found!</h3></body></html>")))
         
 
         
