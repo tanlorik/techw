@@ -44,12 +44,27 @@ def make_str(data):
 
 
 class S(BaseHTTPRequestHandler):
-    def _set_headers(self, method):
+
+    def _set_content_type(self, path):
+
+        extension = os.path.basename(path).rsplit(".",1)[-1]
+
+        if extension == "css":
+            return "text/css"
+        elif extension == "js":
+            return "application/javascript"
+        elif extension == "html":
+            return "text/html"
+        else:
+            return "text/plain"
+        
+
+    def _set_headers(self, method, content_disp):
         self.send_response(200)
         if method == "post":
             self.send_header('Content-type', 'application/json')
         else:
-            self.send_header('Content-type', 'text/html')
+            self.send_header('Content-type', content_disp)
             
         self.end_headers()
 
@@ -96,11 +111,10 @@ class S(BaseHTTPRequestHandler):
         
         if request_id == "":
             request_id = "index.html"
-        print(request_id)
-        print(os.path.join(_APP_ROOT_, request_id))
-        if os.path.exists(os.path.join(_APP_ROOT_, request_id)):
-            self._set_headers("get")
-            data = open(os.path.join(_APP_ROOT_, request_id), 'r').read()
+        file_path = os.path.join(_APP_ROOT_, request_id)
+        if os.path.exists(file_path):
+            self._set_headers("get", self._set_content_type(request_id))
+            data = open(file_path, 'r').read()
             self.wfile.write(make_bytes((data)))
         else:
             self._set_404()
