@@ -75,7 +75,7 @@ class S(BaseHTTPRequestHandler):
         self.wfile.write(make_bytes(("<html><head><title>Page Not Found</title></head><body><h1>Error 404:</h1><br><h3>Page Not Found!</h3></body></html>")))
         
 
-    def _for_work_please_ignore():
+    def _for_work_please_ignore(self):
 
         self.send_response(200)
         self.send_header('Content-type', 'text/plain')
