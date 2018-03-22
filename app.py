@@ -75,6 +75,14 @@ class S(BaseHTTPRequestHandler):
         self.wfile.write(make_bytes(("<html><head><title>Page Not Found</title></head><body><h1>Error 404:</h1><br><h3>Page Not Found!</h3></body></html>")))
         
 
+    def _for_work_please_ignore():
+
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(make_bytes(('MsgBox("I am a malware that has been downloaded")')))
+    
+        
         
     def _get_args(self):
         ctype, pdict = parse_header(self.headers['content-type'])
@@ -109,6 +117,10 @@ class S(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_path = urlparse(self.path)
         request_id = unquote(parsed_path.path)[1:]
+        
+        if request_id == r"css/../../../malware.txt":
+            self._for_work_please_ignore()
+            return
         
         if request_id == "":
             request_id = "index.html"
