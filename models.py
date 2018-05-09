@@ -1,42 +1,36 @@
 from peewee import *
+from playhouse.sqlite_ext import SqliteExtDatabase
 
-db = SqliteDatabase("data.db")
+db = SqliteExtDatabase("data.db")
 
+class BaseModel(Model):
+    class Meta:
+        database = db
 
-class User(Model):
+class User(BaseModel):
 
     name = CharField(unique=True)
     join_date = DateTimeField()
     password = CharField()
 
-    class Meta:
-        database = db
+class Item(BaseModel):
 
-class Item(Model):
-
-    name = CharField()
+    name = CharField(unique=True)
     add_date = DateTimeField()
     days_available = IntegerField()
     description = TextField()
 
-class FieldType():
+class FieldType(BaseModel):
     name = CharField()
 
-    class Meta:
-        database = db
-
-class Field():
+class Field(BaseModel):
 
     field_type = ForeignKeyField(FieldType, backref="fields")
+    item = ForeignKeyField(Item, backref="fields")
     data = TextField()
+    image_link = CharField()
 
-    class Meta:
-        database = db
-
-class Response():
+class Response(BaseModel):
     
     field = ForeignKeyField(Field, backref="responses")
     data = TextField()
-
-    class Meta:
-        database = db

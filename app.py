@@ -6,6 +6,7 @@ import hashlib
 import os
 import shutil
 import zipfile
+import views
 
 from cgi import parse_header, parse_multipart
 
@@ -15,9 +16,8 @@ if sys.version.startswith('3'):
     from urllib.parse import urlparse, parse_qs, unquote
     _py3_ = True
 else:
-    from urlparse import urlparse, parse_qs, unquote
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-    _py3_ = False
+    print("This program requires Python 3")
+    exit(1)
 
 ##########Globals################    
 
@@ -59,7 +59,7 @@ class S(BaseHTTPRequestHandler):
             return "text/plain"
         
 
-    def _set_headers(self, method, content_disp):
+    def _set_headers(self, method, content_disp=None):
         self.send_response(200)
         if method == "post":
             self.send_header('Content-type', 'application/json')
@@ -74,16 +74,6 @@ class S(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(make_bytes(("<html><head><title>Page Not Found</title></head><body><h1>Error 404:</h1><br><h3>Page Not Found!</h3></body></html>")))
         
-
-    def _for_work_please_ignore(self):
-
-        self.send_response(200)
-        self.send_header('Content-type', 'text/plain')
-        self.end_headers()
-        self.wfile.write(make_bytes(('MsgBox("I am a malware that has been downloaded")')))
-    
-        
-        
     def _get_args(self):
         ctype, pdict = parse_header(self.headers['content-type'])
         if ctype == 'multipart/form-data':
@@ -91,7 +81,7 @@ class S(BaseHTTPRequestHandler):
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers['content-length'])
             postvars = parse_qs(
-                    self.rfile.read(length), 
+                    make_str(self.rfile.read(length)), 
                     keep_blank_values=1)
         else:
             postvars = {}
@@ -102,28 +92,32 @@ class S(BaseHTTPRequestHandler):
         return [x.strip() for x in path.split("/")]
 
     def _parse_request(self, method):
-        self._set_headers(method)
         parsed_path = urlparse(self.path)
-        request_id = unquote(parsed_path.path)
-        path_args = self._parse_path(request_id)
+        request_id = unquote(parsed_path.path)[1:]
+#        path_args = self._parse_path(request_id)
         vars = self._get_args()
         fixed_vars = {}
         for item in vars:
             fixed_vars[item] = vars[item][0]
-        if "report" in path_args:
-            report(fixed_vars)
+
+        if request_id.startswith("api/"):
+            self._set_headers(method)
+            views.router(request_id[4:], self.wfile, method, fixed_vars)
+            return
+        else:
+            self._set_404()
                 
 
     def do_GET(self):
         parsed_path = urlparse(self.path)
         request_id = unquote(parsed_path.path)[1:]
         print(request_id)
-        if request_id.endswith("malware.txt"):
-            self._for_work_please_ignore()
-            return
-        
         if request_id == "":
             request_id = "index.html"
+        if request_id.startswith("api/"):
+            self._set_headers("get", self._set_content_type(request_id))
+            views.router(request_id[4:], self.wfile, "get")
+            return
         file_path = os.path.join(_APP_ROOT_, request_id)
         if os.path.exists(file_path):
             self._set_headers("get", self._set_content_type(request_id))
@@ -137,7 +131,7 @@ class S(BaseHTTPRequestHandler):
 
 
     def do_HEAD(self):
-        self._set_headers()
+        self._set_headers("head")
 
 def run(server_class=HTTPServer, handler_class=S, port=None):
     if port is None:
