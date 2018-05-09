@@ -33,7 +33,12 @@ body {
     margin-bottom: 1rem;
 }
 
+.form_label{
+    width:150px;
+}
 
-
+#modal_body{
+    width:70%;
+}
 
 /* login-modal */
