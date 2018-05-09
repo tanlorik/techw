@@ -8,11 +8,11 @@
     </head>
     <body>
         <!-- modala de login -->
-        <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                  <h5 class="modal-title" id="exampleModalLabel">Login</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -33,16 +33,42 @@
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addModalLabel">Add</h5>
+                    <h5 class="modal-title" id="addModalLabel">Add item</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="./api/" method=post>
-                        <input type="text" name="Name" placeholder="name">
-                        <input type="text" name="question" placeholder="question?">
-                        <input type="submit" name="sub" class="login loginmodal-submit" value="Login">
+                    <form action="#" method=post id="add_form">
+                        <input type="button" name="add_button" value="Add Question" class="login loginmodal-submit" id="add_question">
+                        <input type="submit" name="sub" class="login loginmodal-submit" value="Add">
+                        <hr>
+                        <label for="item_name" class="form_label">Name:</label>
+                        <input type="text" name="Name" placeholder="name" id="item_name">
+                        <br />
+                        <label for="item_description" class="form_label">Description: </label>
+                        <input type="text" name="Description" placeholder="description" id="item_description">
+                        <br />
+                        <label for="item_image" class="form_label">Image: </label>
+                        <input type="text" name="Image" placeholder="imgur link" id="item_image">
+                        <br />
+                        <hr>
+                        <span id="q1_span">
+                            <label for="q1_name" class="form_label">Question 1:</label>
+                            <input type="text" name="q1_name" placeholder="question" id="q1_name">
+                            <br />
+                            <label for="q1_type" class="form_label">Type:</label>
+                            <select id="q1_type" name="q1_type" class="question_select">
+                                    <option value="text">Text</option>
+                                    <option value="select">Select</option>
+                                    <option value="checkbox">Checkbox</option>
+                            </select>
+                            <br />
+                            <span id="q1_data_span">
+                            </span>
+                        </span>
+                        <hr>
+                        
                     </form>
                 </div>
               </div>
@@ -63,7 +89,7 @@
                             <a class="nav-link" href="./view.html">View</a>
                         </li>
                     </ul>
-                    <button type="button" class="btn login-btn" data-toggle="modal" data-target="#loginModal">
+                    <button type="button" class="btn login-btn" data-toggle="modal" data-target="#exampleModal">
                         Login
                     </button>
 
@@ -72,8 +98,8 @@
         <div class="container">
              <div class="row">
                  <div class="col-sm-12 contentpage ">
-                    <p class="custom-title text-center">ololo</p> 
-                                           
+                    <p class="custom-title text-center">BulShit</p> 
+                                           <!-- aici ar trb sa apara form-ul de view -->
                 </div>
             </div>
         </div>    
@@ -87,36 +113,10 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
         <script src="./js/jquery.js"></script>  
         <script src="./js/pooper.js"></script>        
         <script src="./js/bootstrap.bundle.js"></script> 
-        <!-- <script>
-            $("#login_button").click(function (e) {
-                e.preventDefault;
-                $('#myModal').modal('toggle')
-
-            })
-        </script>  -->
-
-
-
-
-
-
-
-
-
+        <script src="./js/functions.js"></script> 
 
 
 
