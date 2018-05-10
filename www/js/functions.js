@@ -16,7 +16,7 @@ $("#q1_type").change(function(){
         for(i=1; i<=nr; i++)
         {
             html_data += '<label for="qdata_' + i + '_name" class="form_label">Option ' + i +':</label>';
-            html_data += '<input type="text" name="qdata' + i + '" placeholder="option ' + i + '" id="qdata' + i + '">';
+            html_data += '<input type="text" name="q' + id + 'data' + i + '" placeholder="option ' + i + '" id="q' + id + 'data' + i + '">';
             html_data += '<br />';
         }
 
@@ -43,11 +43,13 @@ $("#add_question").click(function(){
         {
             nr = parseInt(prompt("Number of options: "));
             $(this).parent().children().last().html("");
+            const regex = /q([0-9]*)_type/gm;
+            id = regex.exec(q)[1];
             html_data = "";
             for(i=1; i<=nr; i++)
             {
                 html_data += '<label for="qdata_' + i + '_name" class="form_label">Option ' + i +':</label>';
-                html_data += '<input type="text" name="qdata' + i + '" placeholder="option ' + i + '" id="qdata' + i + '">';
+                html_data += '<input type="text" name="q' + id + 'data' + i + '" placeholder="option ' + i + '" id="q' + id + 'data' + i + '">';
                 html_data += '<br />';
             }
     
