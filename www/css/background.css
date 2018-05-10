@@ -40,5 +40,9 @@ body {
 #modal_body{
     width:70%;
 }
+.modal-dialog {
+    max-width: 800px !important;
+    margin: 1.75rem auto;
+}
 
 /* login-modal */
