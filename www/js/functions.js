@@ -43,8 +43,11 @@ $("#add_question").click(function(){
         {
             nr = parseInt(prompt("Number of options: "));
             $(this).parent().children().last().html("");
+            q = $(this).attr("id");
             const regex = /q([0-9]*)_type/gm;
             id = regex.exec(q)[1];
+            console.log(id);
+            console.log(q)
             html_data = "";
             for(i=1; i<=nr; i++)
             {
