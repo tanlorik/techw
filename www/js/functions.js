@@ -9,7 +9,7 @@ $("#q1_type").change(function(){
         nr = parseInt(prompt("Number of options: "));
         q = $(this).attr("id");
         const regex = /q([0-9]*)_type/gm;
-        id = parseInt(q.match(regex))
+        id = regex.exec(q)[1];
         console.log(id);
         $(this).parent().children().last().html("");
         html_data = "";
