@@ -1,27 +1,32 @@
 from models import *
 import datetime
+import os
+import hashlib
 
+if os.path.exists("data.db"):
+    os.unlink("data.db")
+
+def make_bytes(data):
+
+    return bytes(data, "utf-8")
+   
 db.connect()
 
-db.create_tables([User, Item, FieldType, Field, Response])
+db.create_tables([User, Item, Question, Response])
 
 
 User.create_table()
 Item.create_table()
-FieldType.create_table()
-Field.create_table()
+Question.create_table()
 Response.create_table()
 
 
-u = User.create(name="TAN", join_date=datetime.datetime.now(), password="abc")
+u = User.create(name="TAN", join_date=datetime.datetime.now(), password=hashlib.md5(make_bytes("abc")).hexdigest())
 u.save()
 
-u = User.create(name="CIT", join_date=datetime.datetime.now(), password="123")
+u = User.create(name="CIT", join_date=datetime.datetime.now(), password=hashlib.md5(make_bytes("123")).hexdigest())
 u.save()
 
-for item in ["intrebare", "combobox", "select", "checkbox"]:
-    f = FieldType.create(name=item)
-    f.save()
 
 
 db.close()

@@ -2,6 +2,16 @@
 document.question_count = 1
 
 
+function submit_form(element){
+    submit = element.closest('form').find(':submit').val();
+    data = element.serialize() + '&sub='+submit;
+    url = element.attr('action');
+    console.log(url)
+    $.post(url, data).done(function(ret){
+        console.log(ret);
+    });
+}
+
 $("#q1_type").change(function(){
 
     if($(this).val() != "text")
@@ -66,3 +76,136 @@ $("#add_question").click(function(){
     });
 
 });
+
+function prepQuestion(q, iid){
+
+    html = "";
+    html += "<p>" + q.name +"</p>";
+    q.data = JSON.parse(q.data)
+
+    if(q.qtype == 0){
+
+        html+='<input type=text name="i' + iid + "q" + q.id + '">'
+
+    }else{
+
+        if(q.qtype == 1){
+
+            html+='<select name="i' + iid + "q" + q.id + '">'
+            q.data.forEach(function(i){
+
+                html+= '<option value="' + i + '">' + i + '</option>'; 
+
+            });
+
+            html+="</select>";
+        }else{
+            if(q.qtype == 2){
+                k = 0
+                q.data.forEach(function(i){
+                    console.log(i)
+                    html+= '<input type="checkBox" value="' + i + '" id="i' + iid + 'q' + q.id + 'o' + k +'" name="i' + iid + 'q' + q.id + 'o'+ k++ +'"><label for="i' + iid + 'q' + q.id + '">' + i + '</label>' + '<br>'; 
+                   
+                });
+            }
+        }
+    }
+    return html;
+
+}
+
+function getItems()
+{
+    html = ""
+    $.ajax({
+         url: "./api/all",
+
+        }).done(function(items){
+
+        items = JSON.parse(items)
+        console.log(items);
+        console.log(typeof items);
+
+        items.forEach(function(item){
+            html+= '<div id="item' + item.id + '"><form action="./api/" method=post id="reply_form'+ item.id + '">' ;
+            html+= '<input type="hidden" name="item_id" value="' + item.id + '">'
+            html+= '<h1 class="item_title">' + item.name + '</h1><hr>';
+            html+= '<img src="' + item.image_link + '"><br>';
+            html+= '<p>'+ item.description + '</p><hr>';
+            item.question.forEach(function(q){
+
+                html += prepQuestion(q, item.id)
+                html+="<hr>"
+
+            });
+
+        html += '<input type="submit" name="sub" class="login loginmodal-submit" value="Vote"></form></div>';
+
+        });
+
+        $("#main_content").html(html);
+
+        items.forEach(function(item){
+            console.log("#reply_form" + item.id);
+            $("#replyform" + item.id).submit(function(e){
+                e.preventDefault();
+                submit_form($(this));
+            });
+        })
+
+    });
+}
+
+
+
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function checkCookie() {
+    var user = getCookie("username");
+    if (user != "") {
+        alert("Welcome again " + user);
+    } else {
+        user = prompt("Please enter your name:", "");
+        if (user != "" && user != null) {
+            setCookie("username", user, 365);
+        }
+    }
+}
+
+
+
+
+$(document).ready(function(){
+
+    getItems();/*
+    $("form").submit(function(e){
+        e.preventDefault();
+        submit_form($(this));
+    });
+*/
+    $(document).on("submit", "form", function(e){
+        e.preventDefault();
+        submit_form($(this))
+    })
+})

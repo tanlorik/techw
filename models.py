@@ -10,27 +10,26 @@ class BaseModel(Model):
 class User(BaseModel):
 
     name = CharField(unique=True)
-    join_date = DateTimeField()
+    join_date = DateTimeField(null=True)
     password = CharField()
+    sid = CharField(null=True)
 
 class Item(BaseModel):
 
     name = CharField(unique=True)
-    add_date = DateTimeField()
-    days_available = IntegerField()
-    description = TextField()
+    add_date = DateTimeField(null=True)
+    days_available = IntegerField(null=True)
+    description = TextField(null=True)
+    image_link = CharField(null=True)
 
-class FieldType(BaseModel):
-    name = CharField()
+class Question(BaseModel):
 
-class Field(BaseModel):
-
-    field_type = ForeignKeyField(FieldType, backref="fields")
     item = ForeignKeyField(Item, backref="fields")
-    data = TextField()
-    image_link = CharField()
+    qtype = IntegerField(null=True)
+    data = TextField(null=True)
+    name = CharField(null=True)
 
 class Response(BaseModel):
     
-    field = ForeignKeyField(Field, backref="responses")
-    data = TextField()
+    field = ForeignKeyField(Question, backref="responses")
+    data = TextField(null=True)
