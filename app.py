@@ -21,6 +21,7 @@ else:
 
 if not os.path.exists("data.db"):
     os.system("python init_db.py")
+print(os.getcwd())
 
 ##########Globals################    
 
