@@ -19,6 +19,9 @@ else:
     print("This program requires Python 3")
     exit(1)
 
+if not os.path.exists("data.db"):
+    os.system("python init_db.py")
+
 ##########Globals################    
 
 _DEBUG_ = True
